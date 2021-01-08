@@ -1,0 +1,38 @@
+{
+    "$$schema": "data-formal.json",
+    "timestamp": 1585902707,
+    "columns": [
+        {
+            "name": "prodMinutes",
+            "description": "TBD",
+            "type": "integer"
+        },
+        {
+            "name": "prodPieces",
+            "description": "TBD",
+            "type": "integer"
+        },
+        {
+            "name": "toolChanges",
+            "description": "TBD",
+            "type": "integer"
+        },
+        {
+            "name": "travelDistance",
+            "description": "TBD",
+            "type": "integer"
+        },
+        {
+            "name": "directionChange",
+            "description": "TBD",
+            "type": "integer"
+        },
+        {
+            "name": "materialType",
+            "description": "TBD",
+            "type": "string"
+        }
+    ],
+    "data": [],
+    "signature": "TBD"
+}

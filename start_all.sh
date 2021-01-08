@@ -1,5 +1,6 @@
 #!/bin/bash
-
+ 
+set -e 
 # Dieses bash Script soll demonstrieren wie die Komponenten ohne docker-compose parametrisiert und gestartet werden können
 #
 # Voraussetungen:
@@ -7,7 +8,9 @@
 # * alle KOSMoS-Local Komponenten sind in einem Netz/VLAN
 # * alle KOSMoS Komponenten welche SSL/TLS benötigen haben einen DNS-Name
 # * auflößung von diesen DNS Namen in IP-Adressen funktioniert
-# * Login in der Registry: harbor.kosmos.idcp.inovex.io (docker login harbor.kosmos.idcp.inovex.io)
+# * Entweder:
+#   * Login in der Registry: harbor.kosmos.idcp.inovex.io (docker login harbor.kosmos.idcp.inovex.io)
+#   * Docker Images lokal bauen (build_images.sh)
 #
 # Gestartet wird:
 # * Test-Vault
@@ -18,33 +21,39 @@
 # Da in der Test-Umgebung alles auf einem Rechner läuft wird statt dem KOSMoS-Local Netz ein Docker VSwitch verwendet.
 # Dieses kann aus Netzwerk sicht als ein eigenes getrenntes Netz betrachtet werden.
 
-#region Erstmal umgebung aufräumen
+#region Umgebung aufräumen
 docker_stop_remove_image() {
-    while docker ps -a | grep "harbor.kosmos.idcp.inovex.io/ondics/$1"
+    while docker ps -a | grep "$1" > /dev/null
     do
-        docker rm -f $1
+        echo -n "."
+        docker stop $1 > /dev/null
+        echo -n "."
+        docker rm -f $1 > /dev/null
         sleep 1
     done
 }
 
-docker_stop_remove_image vault-placeholder
-docker_stop_remove_image mqtt-broker
-docker_stop_remove_image mqtt-dashboard
-docker_stop_remove_image machine-simulator
-docker_stop_remove_image blockchain-connector
-
-docker network ls | grep kosmos-local && docker network rm kosmos-local
+echo -n "Umgebung aufräumen"
+docker_stop_remove_image vault-placeholder &&\
+docker_stop_remove_image mqtt-broker &&\
+docker_stop_remove_image mqtt-dashboard &&\
+docker_stop_remove_image blockchain-connector &&\
+docker_stop_remove_image machine-simulator &&\
+docker network ls | grep kosmos-local  > /dev/null && docker network rm kosmos-local > /dev/null &&\
+echo " [OK]" ||\
+echo " [FAIL]"
 #endregion
 
+#region Umgebung vorbereiten
 # Environmentvariablen laden
 . config.env
 
-# Docker Netzwerk für kosmos-local anlegen
-docker network create kosmos-local
+echo -n "Docker Netzwerk für kosmos-local anlegen..."
+docker network create kosmos-local > /dev/null && echo " [OK]"
+#endregion
 
-
-
-#region Vault "Platzhalter" starten - vault-placeholder
+#region Vault "Platzhalter" starten - Container: vault-placeholder
+echo -n "Vault-Platzhalter starten..."
 docker run \
     -d \
     --net kosmos-local \
@@ -67,12 +76,11 @@ docker run \
     --cap-add=IPC_LOCK \
     -p 10003:8200 \
     -p 10004:8201 \
-    harbor.kosmos.idcp.inovex.io/ondics/vault-placeholder:0.3
+    harbor.kosmos.idcp.inovex.io/ondics/vault-placeholder:0.3 > /dev/null && echo " [OK]"
 #endregion
 
-#region TOKEN für PKI aus der Vault laden
-echo -n "Warte auf Vault Token..."
-
+#region Vault-Token für PKI aus der Vault holen
+echo -n "Warte auf Vault Token"
 get_tocken(){
     export VAULT_TOKEN=`curl -s --cacert KOSMoS_GLOBAL_ROOT_CA.crt --request POST --data '{"password": "admin"}' --resolve ca.mqtt.local.kosmos:10004:127.0.0.1 https://ca.mqtt.local.kosmos:10004/v1/auth/userpass/login/admin | jq -r .auth.client_token`
     if [[ $VAULT_TOKEN == "s."* ]]; then
@@ -83,76 +91,88 @@ get_tocken(){
 }
 
 while get_tocken; do
-    sleep 5      
+    echo -n "."
+    sleep 1
 done
 
-echo OK - $VAULT_TOKEN
+echo " [OK] - Token: $VAULT_TOKEN"
 #endregion
 
-# MQTT-Broker starten - mqtt-broker
+#region MQTT-Broker und -Dashboard starten - Container: mqtt-broker, mqtt-dashboard
+echo -n "MQTT-Broker starten..."
 docker run \
     -d \
     --net kosmos-local \
+    --domainname=${KOSMOS_LOCAL_MQTT_BROKER_ROLE_FQDN} \
+    --hostname=${KOSMOS_LOCAL_MQTT_BROKER_HOSTNAME} \
     --net-alias ${KOSMOS_LOCAL_MQTT_BROKER_HOSTNAME}.${KOSMOS_LOCAL_MQTT_BROKER_ROLE_FQDN} \
     --name mqtt-broker \
     -e TZ=Europe/Berlin \
     -e VAULT_TOKEN=${VAULT_TOKEN} \
-    -e MY_CA_FQDN=${KOSMOS_LOCAL_MQTT_CA_FQDN} \
     -e MY_PKI_URI=https://${KOSMOS_LOCAL_MQTT_CA_FQDN}:8201/v1/${KOSMOS_LOCAL_MQTT_PKI_PATH}/issue/${KOSMOS_LOCAL_MQTT_BROKER_ROLE_PATH} \
-    -e MY_FQDN=${KOSMOS_LOCAL_MQTT_BROKER_HOSTNAME}.${KOSMOS_LOCAL_MQTT_BROKER_ROLE_FQDN} \
-    -e KOSMOS_LOCAL_MQTT_BROKER_HOSTNAME \
     -e ALLOW_TLS=true \
-    harbor.kosmos.idcp.inovex.io/ondics/mqtt-broker:rc2
+    harbor.kosmos.idcp.inovex.io/ondics/mqtt-broker:rc3 > /dev/null && echo " [OK]"
 
-# MQTT-Dasboard starten - mqtt-dashboard
+echo -n "MQTT-Dashboard starten..."
 docker run \
     -d \
     --net kosmos-local \
+    --domainname=${KOSMOS_LOCAL_MQTT_CLIENT_ROLE_FQDN} \
+    --hostname=mqtt-dashboard \
     --name mqtt-dashboard \
     -e TZ=Europe/Berlin \
     -e VAULT_TOKEN=${VAULT_TOKEN} \
     -e USE_TLS=true \
-    -e MY_CA_FQDN=${KOSMOS_LOCAL_MQTT_CA_FQDN} \
     -e MY_PKI_URI=https://${KOSMOS_LOCAL_MQTT_CA_FQDN}:8201/v1/${KOSMOS_LOCAL_MQTT_PKI_PATH}/issue/${KOSMOS_LOCAL_MQTT_CLIENT_ROLE_PATH} \
-    -e MY_DN=${KOSMOS_LOCAL_MQTT_CLIENT_ROLE_FQDN} \
     -e MQTT_BROKER_FQDN=${KOSMOS_LOCAL_MQTT_BROKER_HOSTNAME}.${KOSMOS_LOCAL_MQTT_BROKER_ROLE_FQDN} \
     -p 10002:1880 \
-    harbor.kosmos.idcp.inovex.io/ondics/mqtt-dashboard:0.2
-
-exit 0
-# TODO: Test other components
+    harbor.kosmos.idcp.inovex.io/ondics/mqtt-dashboard:0.3 > /dev/null && echo " [OK]"
+#endregion
 
 
-# Blockchain Connector starten - blockchain-connector
+#region Blockchain Connector starten - Container: blockchain-connector
+echo -n "Blockchain-Connector starten..."
 docker run \
     -d \
     --net kosmos-local \
+    --domainname=${KOSMOS_LOCAL_MQTT_CLIENT_ROLE_FQDN} \
+    --hostname=bockchain-connector \
     --name blockchain-connector \
     -e TZ=Europe/Berlin \
+    -e VAULT_TOKEN=${VAULT_TOKEN} \
     -e USE_TLS=true \
     -e USE_STANDALONE_NO_MQTT=false \
-    -e BCC_CONFIG='{"customerId":"ondics-8925-f7bfacb618a4","9d82699b-373a-4b2a-8925-f7bfacb618a4-prodData":{"mqtt-topic":"kosmos/machine-data/9d82699b-373a-4b2a-8925-f7bfacb618a4/Sensor/tbd/Update","blockchain":{"endpoint":"http://kosmos-2017317103.eu-central-1.elb.amazonaws.com/api/machine/9d82699b-373a-4b2a-8925-f7bfacb618a4/prodData","data-mapping":[{"column":"msg.payload.columns[0]","value":"msg.payload.data[0][0]"},{"column":"msg.payload.columns[1]","value":"msg.payload.data[1][0]"},{"column":"msg.payload.columns[2]","value":"msg.payload.data[2][0]"},{"column":"msg.payload.columns[3]","value":"msg.payload.data[3][0]"},{"column":"msg.payload.columns[4]","value":"msg.payload.data[4][0]"},{"column":"msg.payload.columns[5]","value":"msg.payload.data[5][0]"}]}}}' \
-    -e MY_CA_FQDN=${KOSMOS_LOCAL_MQTT_CA_FQDN} \
+    -e BCC_CONFIG="$(cat BCC_CONFIG.json)" \
     -e MY_PKI_URI=https://${KOSMOS_LOCAL_MQTT_CA_FQDN}:8201/v1/${KOSMOS_LOCAL_MQTT_PKI_PATH}/issue/${KOSMOS_LOCAL_MQTT_CLIENT_ROLE_PATH} \
-    -e MY_DN=${KOSMOS_LOCAL_MQTT_CLIENT_ROLE_FQDN} \
     -e MQTT_BROKER_FQDN=${KOSMOS_LOCAL_MQTT_BROKER_HOSTNAME}.${KOSMOS_LOCAL_MQTT_BROKER_ROLE_FQDN} \
-    -p 8013:1880 \
-    harbor.kosmos.idcp.inovex.io/ondics/blockchain-connector:0.2.4
+    -p 10005:1880 \
+    harbor.kosmos.idcp.inovex.io/ondics/blockchain-connector:0.2.5 > /dev/null && echo " [OK]"
+#endregion
 
-# 20 Sekunden warten, damit der vault-placeholder initialisieren und der BCC mit dem Broker verbinden kann. 
+echo -n "Maschinen-Simulator startet in x sec. Gesendete Daten werden in die Blockchain gesendet.
+Abbrechen mit belbiger taste."
+for i in {30..01}
+do
+echo -n "$i"
+sleep 1
+done
+echo
 sleep 20
 
-# Maschinen-Simulator starten - machine-simulator
+#region Maschinen-Simulator starten - Container: machine-simulator
 #
 # Achtung! Gesendete Daten landen in der Blockchain!
 #
-docker run \
+echo docker run \
     -d \
     --net kosmos-local \
+    --domainname=${KOSMOS_LOCAL_MQTT_CLIENT_ROLE_FQDN} \
+    --hostname=machine-a0b1c2d3 \
     --name machine-simulator \
-    -e MY_CA_FQDN=${KOSMOS_LOCAL_MQTT_CA_FQDN} \
+    -e PAYLOAD="$(cat MS_BCC_PAYLOAD.json)" \
+    -e VAULT_TOKEN=${VAULT_TOKEN} \
     -e MY_PKI_URI=https://${KOSMOS_LOCAL_MQTT_CA_FQDN}:8201/v1/${KOSMOS_LOCAL_MQTT_PKI_PATH}/issue/${KOSMOS_LOCAL_MQTT_CLIENT_ROLE_PATH} \
-    -e MY_FQDN=machine-simulator.${KOSMOS_LOCAL_MQTT_CLIENT_ROLE_FQDN} \
     -e MQTT_BROKER_FQDN=${KOSMOS_LOCAL_MQTT_BROKER_HOSTNAME}.${KOSMOS_LOCAL_MQTT_BROKER_ROLE_FQDN} \
     -e TOPIC='kosmos/machine-data/9d82699b-373a-4b2a-8925-f7bfacb618a4/Sensor/tbd/Update' \
-    harbor.kosmos.idcp.inovex.io/ondics/machine-simulator:rc1
+    harbor.kosmos.idcp.inovex.io/ondics/machine-simulator:rc1 && echo " [OK]"
+#endregion

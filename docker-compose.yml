@@ -1,0 +1,5 @@
+version: "2"
+
+services:
+  vault-placeholder:
+    build: https://github.com/kosmos-industrie40/kosmos-local-mqtt-broker.git

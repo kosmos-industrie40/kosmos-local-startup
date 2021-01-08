@@ -1,0 +1,28 @@
+{
+    "customerId": "ondics-8925-f7bfacb618a4",
+    "9d82699b-373a-4b2a-8925-f7bfacb618a4-prodData": {
+        "mqtt-topic": "kosmos/machine-data/9d82699b-373a-4b2a-8925-f7bfacb618a4/Sensor/tbd/Update",
+        "blockchain": {
+            "endpoint": "http://kosmos-2017317103.eu-central-1.elb.amazonaws.com/api/machine/9d82699b-373a-4b2a-8925-f7bfacb618a4/prodData",
+            "data-mapping": [{
+                "column": "msg.payload.columns[0]",
+                "value": "msg.payload.data[0][0]"
+            }, {
+                "column": "msg.payload.columns[1]",
+                "value": "msg.payload.data[1][0]"
+            }, {
+                "column": "msg.payload.columns[2]",
+                "value": "msg.payload.data[2][0]"
+            }, {
+                "column": "msg.payload.columns[3]",
+                "value": "msg.payload.data[3][0]"
+            }, {
+                "column": "msg.payload.columns[4]",
+                "value": "msg.payload.data[4][0]"
+            }, {
+                "column": "msg.payload.columns[5]",
+                "value": "msg.payload.data[5][0]"
+            }]
+        }
+    }
+}
