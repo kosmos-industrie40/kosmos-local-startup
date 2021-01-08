@@ -149,21 +149,22 @@ docker run \
     harbor.kosmos.idcp.inovex.io/ondics/blockchain-connector:0.2.5 > /dev/null && echo " [OK]"
 #endregion
 
-echo -n "Maschinen-Simulator startet in x sec. Gesendete Daten werden in die Blockchain gesendet.
-Abbrechen mit belbiger taste."
+echo "Maschinen-Simulator starten..."
+echo -e "\e[31m###############################################################################\e[39m"
+echo -e "\e[31m### Achtung: Der Blockchain Connector sendet diese Daten in die Blockchain. ###\e[39m"
+echo -e "\e[31m###############################################################################\e[39m"
+echo ""
 for i in {30..01}
 do
-echo -n "$i"
+echo -e "\e[1A\e[KStartet in [$i] sek. - Abbrechen mit STRG-C."
 sleep 1
 done
-echo
-sleep 20
 
 #region Maschinen-Simulator starten - Container: machine-simulator
 #
 # Achtung! Gesendete Daten landen in der Blockchain!
 #
-echo docker run \
+docker run \
     -d \
     --net kosmos-local \
     --domainname=${KOSMOS_LOCAL_MQTT_CLIENT_ROLE_FQDN} \
