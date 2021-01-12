@@ -44,6 +44,49 @@ cd kosmos-local-startup
 #./build_all.sh
 ./start_all.sh
 ``` 
+  
+  
+## Das Netzwerk in der EDGE
+
+
+Um das Netzwerk der EDGE zu simulieren initialisiert das `start_all.sh` Script einen virtuellen Docker Switch (`docker network create kosmos-local`).
+Alle Komponenten in der Testumgebung müssen Teil dieses Netzes sein um sich:
+* mit dem MQTT Broker zu verbinden
+* mit der Vault interagieren zu können
+
+Der MQTT-Broker ist ein zentrales Element in der EDGE.
+
+Hier die Eckdaten des aufgespannten virtuellen Netzwerks:    
+* Der MQTT-Broker ist erreichbar unter `mqtt.brokers.mqtt.local.kosmos`  
+* Alle MQTT-Subscriber und -Publisher müssen das DNS-Prefix bekommen: `*.clients.mqtt.local.kosmos`  
+  * Dies wurde in der Vault als Rollenname für MQTT-Clients festgelegt
+* Die Vault ist unter `ca.mqtt.local.kosmos`, `ca.local.kosmos` und `ca.global.kosmos` erreichbar  
+  * Die DNS bezeichnungen `local` und `global` sollen dazu dienen, die Rollen der Vault als CA im jeweiligen KOSMoS Umfeld zu Simulieren
+
+
+Alle Komponenten, welche mit dem MQTT-Broker komunizieren sollen, müssen sich in diesen virtuellen Switch "einstecken".
+```bash
+docker run
+[...]
+    --net kosmos-local \
+[...]
+```
+
+Alle Komponenten, welche für andere Komponenten per SSL/TLS erreichbar sein müssen, brauchen (mindestens) einen DNS Namen.  
+```
+# Der Vault Placeholder ist zu anschaungszecken unter 3 DNS-Namen erreichbar:
+docker run 
+[...]
+    --net-alias ca.mqtt.local.kosmos \
+    --net-alias ca.local.kosmos \
+    --net-alias ca.global.kosmos \
+[...]
+```
+
+Dem `start_all.sh` Script können Beispiel-Services entnommen werden.
+
+
+
 
 ## Credits
 
