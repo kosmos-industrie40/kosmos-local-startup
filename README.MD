@@ -1,4 +1,4 @@
-# kosmos-local-startup: Start der KOSMoS-local Umgebung
+# Start der KOSMoS-local Umgebung
 
 Mit diesem Skript kann die komplette KOSMoS-local Umgebung gestartet werden. Die KOSMoS-local Umgebung läuft auf der EDGE bei einem Maschinenbetreiber, der an KOSMoS-Prozessen teilnimmt.
 
