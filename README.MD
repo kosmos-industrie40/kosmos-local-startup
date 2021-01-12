@@ -8,7 +8,6 @@ Die KOSMoS-local Umgebung besteht aus den Komponenten
 * (Blockchain-Connector)[https://github.com/kosmos-industrie40/kosmos-local-blockchain-connector]: Übertragung Maschinendaten an die KOSMoS-Blockchain
 * (Maschinen-Daten-Simulator)[https://github.com/kosmos-industrie40/kosmos-local-machine-simulator]: Erzeugung von Maschinendaten zum Test der KOSMoS-Komponenten
 
-Im Forschungsprojekt KOSMoS werden neue Geschäftsmodelle für den Maschinenbau auf Basis von sicheren infrastrukturen (z.B. Blockchain) entwickelt. Das Projekt (2019-2022) wird vom BMBF gefördert. Weitere Informationen unter https://www.kosmos-bmbf.de
 
 [Changelog](./doc/CHANGELOG.MD)  
 [Todo Liste](./doc/TODO.MD)  
@@ -49,6 +48,8 @@ cd kosmos-local-startup
 ## Credits
 
 Dieses Repo wurde erstellt im Rahmen des BMBF Forschungsprojektes KOSMoS. Danke, BMBF!
+
+Im Forschungsprojekt KOSMoS werden neue Geschäftsmodelle für den Maschinenbau auf Basis von sicheren infrastrukturen (z.B. Blockchain) entwickelt. Das Projekt (2019-2022) wird vom BMBF gefördert. Weitere Informationen unter https://www.kosmos-bmbf.de
 
 Verwendete Software und Technologien:
 
