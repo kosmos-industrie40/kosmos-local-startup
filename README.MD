@@ -4,9 +4,9 @@ Mit diesem Skript kann die komplette KOSMoS-local Umgebung gestartet werden. Die
 
 Die KOSMoS-local Umgebung besteht aus den Komponenten
 
-* (MQTT-Broker)[https://github.com/kosmos-industrie40/kosmos-local-mqtt-broker]: sichere Kommunikation (incl. Vault)
-* (Blockchain-Connector)[https://github.com/kosmos-industrie40/kosmos-local-blockchain-connector]: Übertragung Maschinendaten an die KOSMoS-Blockchain
-* (Maschinen-Daten-Simulator)[https://github.com/kosmos-industrie40/kosmos-local-machine-simulator]: Erzeugung von Maschinendaten zum Test der KOSMoS-Komponenten
+* [MQTT-Broker](https://github.com/kosmos-industrie40/kosmos-local-mqtt-broker): sichere Kommunikation (incl. Vault)
+* [Blockchain-Connector](https://github.com/kosmos-industrie40/kosmos-local-blockchain-connector): Übertragung Maschinendaten an die KOSMoS-Blockchain
+* [Maschinen-Daten-Simulator](https://github.com/kosmos-industrie40/kosmos-local-machine-simulator): Erzeugung von Maschinendaten zum Test der KOSMoS-Komponenten
 
 
 [Changelog](./doc/CHANGELOG.MD)  
