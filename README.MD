@@ -9,8 +9,8 @@ Die KOSMoS-local Umgebung besteht aus den Komponenten
 * [Maschinen-Daten-Simulator](https://github.com/kosmos-industrie40/kosmos-local-machine-simulator): Erzeugung von Maschinendaten zum Test der KOSMoS-Komponenten
 
 
-[Changelog](./doc/CHANGELOG.md)  
-[Todo Liste](./doc/TODO.md)  
+[Changelog](./CHANGELOG.md)  
+[Todo Liste](./TODO.md)  
   
 
 ## Voraussetzungen zur Installation/Nutzung
