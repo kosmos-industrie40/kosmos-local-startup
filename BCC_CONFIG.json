@@ -24,5 +24,15 @@
                 "value": "msg.payload.data[5][0]"
             }]
         }
+    },
+    "passthrough": {
+        "mqtt-topic": "kosmos/machine-data/passthrough-test-machine-123/Sensor/tbd/Update",
+        "blockchain": {
+            "endpoint": "http://kosmos-2017317103.eu-central-1.elb.amazonaws.com/api/passthroughMachine/",
+            "data-mapping": [{
+                "column": "msg.topic",
+                "value": "msg.payload"
+            }]
+        }
     }
 }
