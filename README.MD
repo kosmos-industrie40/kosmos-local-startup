@@ -1,8 +1,14 @@
 # Locales KOSMoS Tool-Repository
 
-# Lokales KOSMoS local "startup"
+Mit diesem Skript kann die komplette KOSMoS-local Umgebung gestartet werden. Die KOSMoS-local Umgebung läuft auf der EDGE bei einem Maschinenbetreiber, der an KOSMoS-Prozessen teilnimmt.
 
-Diesese Helferscript soll dazu dienen, eine Komplette KOSMoS Local Umgebung zu starten.
+Die KOSMoS-local Umgebung besteht aus den Komponenten
+
+* (MQTT-Broker)[https://github.com/kosmos-industrie40/kosmos-local-mqtt-broker]: sichere Kommunikation (incl. Vault)
+* (Blockchain-Connector)[https://github.com/kosmos-industrie40/kosmos-local-blockchain-connector]: Übertragung Maschinendaten an die KOSMoS-Blockchain
+* (Maschinen-Daten-Simulator)[https://github.com/kosmos-industrie40/kosmos-local-machine-simulator]: Erzeugung von Maschinendaten zum Test der KOSMoS-Komponenten
+
+Im Forschungsprojekt KOSMoS werden neue Geschäftsmodelle für den Maschinenbau auf Basis von sicheren infrastrukturen (z.B. Blockchain) entwickelt. Das Projekt (2019-2022) wird vom BMBF gefördert. Weitere Informationen unter https://www.kosmos-bmbf.de
 
 [Changelog](./doc/CHANGELOG.MD)  
 [Todo Liste](./doc/TODO.MD)  
@@ -55,4 +61,4 @@ Verwendete Software und Technologien:
 
 ## Author
 
-Andreas Clausnizer (C) 2020, Ondics GmbH
+(C) 2020, Ondics GmbH
