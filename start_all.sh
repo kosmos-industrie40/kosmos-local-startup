@@ -23,6 +23,7 @@ set -e
 
 #region Umgebung aufräumen
 docker_stop_remove_image() {
+    echo "stop and remove container: $1"
     while docker ps -a | grep "$1" > /dev/null
     do
         echo -n "."
@@ -175,5 +176,5 @@ docker run \
     -e MY_PKI_URI=https://${KOSMOS_LOCAL_MQTT_CA_FQDN}:8201/v1/${KOSMOS_LOCAL_MQTT_PKI_PATH}/issue/${KOSMOS_LOCAL_MQTT_CLIENT_ROLE_PATH} \
     -e MQTT_BROKER_FQDN=${KOSMOS_LOCAL_MQTT_BROKER_HOSTNAME}.${KOSMOS_LOCAL_MQTT_BROKER_ROLE_FQDN} \
     -e TOPIC='kosmos/machine-data/9d82699b-373a-4b2a-8925-f7bfacb618a4/Sensor/tbd/Update' \
-    harbor.kosmos.idcp.inovex.io/ondics/machine-simulator:rc1 && echo " [OK]"
+    harbor.kosmos.idcp.inovex.io/ondics/machine-simulator:rc2 && echo " [OK]"
 #endregion
