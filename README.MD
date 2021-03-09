@@ -103,7 +103,7 @@ Zwei Schritte sind erforderlich:
 
 Beispiel: 
 
-* Es sollen die Ports 10002 bis 10005 der gestarteten Services aus dem Internet erreichbar sein.
+* Es sollen die Ports 10001 bis 10005 der gestarteten Services aus dem Internet erreichbar sein.
 * Die aus dem Internet-erreichbare Adresse lautet: 1.2.3.4
 
 Schritt 1:
