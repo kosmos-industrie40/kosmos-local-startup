@@ -23,6 +23,7 @@ Die KOSMoS-local Umgebung besteht aus den Komponenten
     * 10004 [Vault UI (HTTPS Self Signed)](https://localhost:10004)
     * 10005 [Blockchain Connector Dashboard](http://localhost:10005/ui)
 
+Hinweise wichtige zur (#Konfiguration des Nginx-Proxy zur Erreichbarkeit aus dem Internet)
 
 ## Konfiguration
   
@@ -85,8 +86,73 @@ docker run
 
 Dem `start_all.sh` Script können Beispiel-Services entnommen werden.
 
+#nginx-konfig
+## Konfiguration des Nginx-Proxy zur Erreichbarkeit aus dem Internet
 
+Die Docker-Services müssen über Domainnamen angesrochen werden.
+IP-Adressen funktionieren leider nicht (wäre so einfach...).
 
+Zur Umsetzung von IP-Adressen auf Domainnamen können zwei Schritte helfen:
+
+1. Der Nginx auf dem Host muss als Reverse Proxy konfiguriert werden
+2. Die Namens-IP-Adress-Umsetzung wird durch `nip.io` erledigt
+
+Beispiel: 
+
+* Es sollen die Ports 10002 bis 10005 der gestarteten Services aus dem Internet erreichbar sein.
+* Die aus dem Internet-erreichbare Adresse lautet: 1.2.3.4
+
+Schritt 1:
+
+Die Datei /etc/nginx/sites-enabled/default muss erweitert werden:
+
+server {
+        listen 80 default_server;
+        listen [::]:80 default_server;
+
+        root /var/www/html;
+
+        # Add index.php to the list if you are using PHP
+        index index.html index.htm index.nginx-debian.html;
+
+        server_name _;
+        location / {
+
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+
+        if ($host = 'port10001.1.2.3.4.nip.io') {
+            proxy_pass http://localhost:10001;
+        }
+        if ($host = 'port10002.1.2.3.4.nip.io') {
+            proxy_pass http://localhost:10002;
+        }
+        if ($host = 'port10003.1.2.3.4.nip.io') {
+            proxy_pass http://localhost:10003;
+        }
+        if ($host = 'port10004.1.2.3.4.nip.io') {
+            proxy_pass http://localhost:10004;
+        }
+        if ($host = 'port10005.1.2.3.4.nip.io') {
+            proxy_pass http://localhost:10005;
+        }
+    }
+}
+
+Dann Nginx neu starten.
+
+Schritt 2:
+
+Der Aufruf aus dem Browser kann nun mit folgenden Adressen erfolgen:
+
+http://port10001.1.2.3.4.nip.io/
+http://port10002.1.2.3.4.nip.io/
+http://port10003.1.2.3.4.nip.io/
+http://port10004.1.2.3.4.nip.io/
+http://port10005.1.2.3.4.nip.io/
+
+Die Antworten kommen dan von den Docker-Containern, die jeweils ihre internen Ports als Port 10002,... freigeben.
 
 ## Credits
 
