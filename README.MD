@@ -23,7 +23,7 @@ Die KOSMoS-local Umgebung besteht aus den Komponenten
     * 10004 [Vault UI (HTTPS Self Signed)](https://localhost:10004)
     * 10005 [Blockchain Connector Dashboard](http://localhost:10005/ui)
 
-Hinweise wichtige zur (#Konfiguration des Nginx-Proxy zur Erreichbarkeit aus dem Internet)
+Hinweise wichtige zur [Konfiguration des Nginx-Proxy zur Erreichbarkeit aus dem Internet](#Konfiguration des Nginx-Proxy zur Erreichbarkeit aus dem Internet)
 
 ## Konfiguration
   
