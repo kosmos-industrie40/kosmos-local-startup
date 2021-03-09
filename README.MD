@@ -152,11 +152,11 @@ Schritt 2:
 
 Der Aufruf aus dem Browser kann nun mit folgenden Adressen erfolgen:
 
-http://port10001.1.2.3.4.nip.io/
-http://port10002.1.2.3.4.nip.io/
-http://port10003.1.2.3.4.nip.io/
-http://port10004.1.2.3.4.nip.io/
-http://port10005.1.2.3.4.nip.io/
+* http://port10001.1.2.3.4.nip.io/
+* http://port10002.1.2.3.4.nip.io/
+* http://port10003.1.2.3.4.nip.io/
+* http://port10004.1.2.3.4.nip.io/
+* http://port10005.1.2.3.4.nip.io/
 
 Die Antworten kommen dann von den entsprechenden Docker-Containern. Voilà!
 
