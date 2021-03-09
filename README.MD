@@ -23,7 +23,7 @@ Die KOSMoS-local Umgebung besteht aus den Komponenten
     * 10004 [Vault UI (HTTPS Self Signed)](https://localhost:10004)
     * 10005 [Blockchain Connector Dashboard](http://localhost:10005/ui)
 
-Hinweise wichtige zur [Konfiguration des Nginx-Proxy zur Erreichbarkeit aus dem Internet](#Konfiguration des Nginx-Proxy zur Erreichbarkeit aus dem Internet)
+Hinweise wichtige zur [Konfiguration des Nginx-Proxy zur Erreichbarkeit aus dem Internet](#konfiguration-nginx)
 
 ## Konfiguration
   
@@ -86,13 +86,17 @@ docker run
 
 Dem `start_all.sh` Script können Beispiel-Services entnommen werden.
 
-#nginx-konfig
-## Konfiguration des Nginx-Proxy zur Erreichbarkeit aus dem Internet
 
-Die Docker-Services müssen über Domainnamen angesrochen werden.
-IP-Adressen funktionieren leider nicht (wäre so einfach...).
+## Konfiguration Nginx
 
-Zur Umsetzung von IP-Adressen auf Domainnamen können zwei Schritte helfen:
+Wenn die KOSMoS-lokal Umgebung aus dem Internet oder größeren Firmennetzwerken angesprochen 
+werden soll, müssen die Docker-Services per Hostname aufrufbar sein. Die IP-Adressen
+müssen also mit Domainnamen verbunden werden.
+
+Da diese auf verschiedenen Ports (10001, 10002, ...) zur Verfügung stehen, muss der
+Nginx des Hosts als Proxy erweitert werden.
+
+Zwei Schritte sind erforderlich:
 
 1. Der Nginx auf dem Host muss als Reverse Proxy konfiguriert werden
 2. Die Namens-IP-Adress-Umsetzung wird durch `nip.io` erledigt
@@ -104,7 +108,7 @@ Beispiel:
 
 Schritt 1:
 
-Die Datei /etc/nginx/sites-enabled/default muss erweitert werden:
+Die Datei /etc/nginx/sites-enabled/default ist zu erweitern:
 
 server {
         listen 80 default_server;
@@ -140,7 +144,9 @@ server {
     }
 }
 
-Dann Nginx neu starten.
+Dann Nginx neu starten:
+   
+    $ sudo service nginx restart
 
 Schritt 2:
 
@@ -152,7 +158,7 @@ http://port10003.1.2.3.4.nip.io/
 http://port10004.1.2.3.4.nip.io/
 http://port10005.1.2.3.4.nip.io/
 
-Die Antworten kommen dan von den Docker-Containern, die jeweils ihre internen Ports als Port 10002,... freigeben.
+Die Antworten kommen dann von den entsprechenden Docker-Containern. Voilà!
 
 ## Credits
 
